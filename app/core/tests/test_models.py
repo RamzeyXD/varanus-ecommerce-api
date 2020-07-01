@@ -1,8 +1,15 @@
 from django.test import TestCase
 from django.contrib.auth import get_user_model
 
+from core import models
 
-class UserTests(TestCase):
+
+def sample_user(email='Test1234@gmail.com', password='Testpassword123'):
+    """Create a sample user"""
+    return get_user_model().objects.create_user(email, password)
+
+
+class ModelTests(TestCase):
     def test_user_create_correct(self):
         """Test creating a new user with an email correct"""
         email = 'test123@gmail.com'
@@ -38,3 +45,29 @@ class UserTests(TestCase):
         )
 
         self.assertEqual(user.email, email.lower())
+
+    def test_product_str(self):
+        """Test the product string representation"""
+        product = models.Product.objects.create(
+            name='TestName',
+            description='My small description for test case',
+            cost=5
+        )
+
+        self.assertEqual(str(product), product.name)
+
+    def test_order_str(self):
+        """Test the order string representation"""
+        product = models.Product.objects.create(
+            name='TestName',
+            description='My small description for test case',
+            cost=5
+        )
+
+        order = models.Order.objects.create(
+            owner=sample_user()
+        )
+        order.products.add(product)
+        order.save()
+
+        self.assertEqual(str(order.owner), str(order))
